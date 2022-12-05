@@ -10,7 +10,7 @@ public class DayX
 {
     static Logg log = new Logg(DayX.class, Logg.Level.INFO);
 
-    private static final String DAY = "dayX";
+    private static final String DAY = DayX.class.getSimpleName().toLowerCase();
     private static final String EASYINPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/easyInput.txt";
     private static final String INPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/input.txt";
 
