@@ -19,7 +19,7 @@ public class Day5
 
     public static void main(String[] args)
     {
-        log.info(DAY);
+        //log.info(DAY);
         long start = System.currentTimeMillis();
 
         try
@@ -34,27 +34,39 @@ public class Day5
                 if(str.contains("1") && !str.contains("move"))
                 {
                     righe=str.split("[0-9]").length;
-                    log.info("num: "+righe);
+//                    //log.info("num: "+righe);
                     break;
                 }
             }
             assert righe > 0 && colonne > 0;
 
-//            char[][] matr = new char[colonne][righe];
             List<List<Character>> matr = new ArrayList<>();
 
             sc = new Scanner(new File(INPUTPATH));
             int count=0;
+            int contatore=0;
             boolean invertita=false;
             while(sc.hasNext())
             {
                 String str = sc.nextLine();
+
                 if(str.contains("["))
                 {
-                    StringBuilder s1 = new StringBuilder(str.replace("[", "")
-                            .replace("]", "")
-                            .replace("   ", "-")
-                            .replace(" ", ""));
+                    StringBuilder s1 = new StringBuilder();
+                    char[] cha = str.toCharArray();
+                    for(int i=0;i<cha.length;i++)
+                    {
+                        if(cha[i]=='[')
+                        {
+                            s1.append(cha[i+1]);
+                            continue;
+                        }
+                        if(cha[i]== ' ' && cha[i+3]==' ')
+                        {
+                            i+=3;
+                            s1.append('-');
+                        }
+                    }
                     while(s1.length()<righe) s1.append("-");
 
                     char[] chars = s1.toString().toCharArray();
@@ -66,7 +78,7 @@ public class Day5
                     }
                     matr.add(lc);
                     count++;
-                    log.info(matr.toString());
+//                    //log.info(matr.toString());
                 }
                 else if(str.contains("move"))
                 {
@@ -74,27 +86,151 @@ public class Day5
                             .replace("move", "")
                             .replace("from", ",")
                             .replace("to",",");
-                    log.info(s.split(",")[0]);
+                    //log.info(s.split(",")[0]);
 
                     if(!invertita)
                     {
                         matr=inverti(matr);
                         invertita=true;
                     }
-                    log.info("ALTRO GIROOOOOOOOOOOOOOo");
+                    //printaRev(matr);
+                    //log.info("Next trip:  "+ ++contatore);
                     matr = eseguiIstruzioni(s, matr, righe, colonne);
-//                    log.info(matr);
+//                    //log.info(matr);
                 }
                 //else empty row and number row, skip
             }
-            log.info("\n\nFINITO");
-            printaRev(matr);
+            //log.info("\n\nFINITO");
+            //printaRev(matr);
+            printaStringa(matr);
             log.info("Duration: "+ (System.currentTimeMillis()-start)+"ms");
         }
         catch(IOException ex)
         {
-            log.error("FNF: "+INPUTPATH);
+            //log.error("FNF: "+INPUTPATH);
         }
+    }
+
+    private static List<List<Character>> eseguiIstruzioni(String s, List<List<Character>> matr, int righe, int colonne)
+    {
+        String[] str = s.split(",");
+        int move = Integer.parseInt(str[0]);
+        int from = Integer.parseInt(str[1])-1;
+        int to   = Integer.parseInt(str[2])-1;
+
+//        assert move <= righe; //&& from <= colonne && to <= colonne;
+        List<Character> camb = new ArrayList<>();
+        char tmp = '@';
+        for(int i=0; i<move;i++)
+        {
+            int ultimaRigaFrom = -1;
+            for(int x=matr.size()-1;x>=0;x--)
+            {
+                if(matr.get(x).get(from) != '-')
+                {
+                    ultimaRigaFrom=x; 
+                    break;
+                }
+            }
+            if(ultimaRigaFrom == -1) ultimaRigaFrom=0;
+
+            tmp = matr.get(ultimaRigaFrom).get(from);
+            assert tmp != '-';
+            camb.add(tmp);
+            matr.get(ultimaRigaFrom).set(from, '-');
+            //printaRev(matr);
+        }
+
+        //printaRev(matr);
+        for(int i=0;i<move;i++)
+        {
+            int ultimaRigaTo = -1;
+            for(int x=matr.size()-1;x>=0;x--)
+            {
+                if(matr.get(x).get(to) != '-')
+                {
+                    ultimaRigaTo=x+1;
+                    break;
+                }
+            }
+            if(ultimaRigaTo == matr.size())
+            {
+                matr.add(new ArrayList<>());
+                for(int j=0;j<matr.get(0).size();j++)
+                {
+                    matr.get(matr.size()-1).add('-');
+                }
+            }
+            if(ultimaRigaTo == -1) ultimaRigaTo=0;
+            matr.get(ultimaRigaTo).set(to, camb.get(camb.size()-1-i));
+        }
+        //printaRev(matr);
+
+//          first part
+//        for(int i=0; i<move;i++)
+//        {
+//            int ultimaRigaFrom = -1;
+//            int ultimaRigaTo = -1;
+//            for(int x=matr.size()-1;x>=0;x--)
+//            {
+//                if(matr.get(x).get(from) != '-' && ultimaRigaFrom == -1)
+//                {
+//                    ultimaRigaFrom=x;
+//                }
+//                if(matr.get(x).get(to) != '-' && ultimaRigaTo == -1)
+//                {
+//                    ultimaRigaTo=x+1;
+//                }
+//                if(ultimaRigaFrom != -1 && ultimaRigaTo != -1) break;
+//            }
+//            if(ultimaRigaTo == -1) ultimaRigaTo=0;
+//            if(ultimaRigaFrom == -1) ultimaRigaFrom=0;
+//
+//            if(ultimaRigaTo == matr.size())
+//            {
+//                matr.add(new ArrayList<>());
+//                for(int j=0;j<matr.get(0).size();j++)
+//                {
+//                    matr.get(matr.size()-1).add('-');
+//                }
+//            }
+//            char tmp = matr.get(ultimaRigaFrom).get(from);
+//            assert tmp != '-';
+//            matr.get(ultimaRigaFrom).set(from, '-');
+//            matr.get(ultimaRigaTo).set(to, tmp);
+//
+//            printaRev(matr);
+//        }
+        return matr;
+    }
+
+    private static void printaRev(List<List<Character>> matr)
+    {
+        for(int i=matr.size()-1;i>=0;i--)
+        {
+            log.info(i+") "+matr.get(i).toString());
+        }
+        log.info("###################");
+    }
+
+    private static void printaStringa(List<List<Character>> matr)
+    {
+        StringBuilder sb = new StringBuilder();
+        matr=inverti(matr);
+        int n=0;
+        int i=0;
+        while(i<matr.size() && n<matr.get(0).size())
+        {
+            if(matr.get(i).get(n) != '-')
+            {
+                sb.append(matr.get(i).get(n));
+                n++;
+                i=0;
+                continue;
+            }
+            i++;
+        }
+        log.info(sb.toString());
     }
 
     private static List<List<Character>> inverti(List<List<Character>> matr)
@@ -106,103 +242,4 @@ public class Day5
         }
         return rev;
     }
-
-    private static List<List<Character>> eseguiIstruzioni(String s, List<List<Character>> matr, int righe, int colonne)
-    {
-        String[] str = s.split(",");
-        int move = Integer.parseInt(str[0]);
-        int from = Integer.parseInt(str[1])-1;
-        int to   = Integer.parseInt(str[2])-1;
-
-//        assert move <= righe; //&& from <= colonne && to <= colonne;
-
-        for(int i=0; i<move;i++)
-        {
-            int ultimaRigaFrom = -1;
-            int ultimaRigaTo = -1;
-            for(int x=matr.size()-1;x>=0;x--)
-            {
-                if(matr.get(x).get(from) != '-' && ultimaRigaFrom == -1)
-                {
-                    ultimaRigaFrom=x;
-                }
-                if(matr.get(x).get(to) != '-' && ultimaRigaTo == -1)
-                {
-                    ultimaRigaTo=x+1;
-                }
-                if(ultimaRigaFrom != -1 && ultimaRigaTo != -1) break;
-            }
-
-//            assert ultimaRigaFrom != -1 || ultimaRigaTo != -1;
-//            printaRev(matr);
-
-            if(ultimaRigaTo == matr.size())
-            {
-                matr.add(new ArrayList<>());
-                for(int j=0;j<matr.get(0).size();j++)
-                {
-                    matr.get(matr.size()-1).add('-');
-                }
-            }
-
-            //fa dei casini con quel -1 che va fuori bound
-            char tmp = matr.get((ultimaRigaFrom==-1)?0:ultimaRigaFrom).get(from);
-            assert tmp != '-';
-            matr.get((ultimaRigaFrom==-1)?0:ultimaRigaFrom).set(from, '-');
-            assert matr.get((ultimaRigaTo==-1)?0:ultimaRigaTo).get(to) == '-';
-            matr.get((ultimaRigaTo==-1)?0:ultimaRigaTo).set(to, tmp);
-
-            printaRev(matr);
-        }
-        return matr;
-    }
-
-    private static void printaRev(List<List<Character>> matr)
-    {
-//        for(List<Character> lc : matr)
-        for(int i=matr.size()-1;i>=0;i--)
-        {
-            log.info(matr.get(i).toString());
-        }
-        log.info("###################");
-    }
 }
-
-
-/*
-            int nfrom = -1;
-            int nto = -1;
-            for(int x = 0;x<righe;x++)
-            {
-                if(matr.get(x).get(from) != '-')
-                {
-                    nfrom=x;
-                    break;
-                }
-            }
-            for(int x = 0;x<righe;x++) //Da qui esce nto==-1; perchè fa un giro in più dal move?
-            {
-                if(matr.get(x).get(to) != '-')
-                {
-                    nto=x;
-                    break;
-                }
-            }
-//            assert nfrom>=0 && nto>=0;
-            if(nto==0)
-            {
-                List<List<Character>> nuoval = new ArrayList<>();
-                nuoval.add(new ArrayList<>());
-                for(int j=0;j<colonne;j++)
-                {
-                    nuoval.get(0).add('-');
-                }
-                nuoval.addAll(matr);
-                matr=nuoval;
-                nto++;
-                nfrom++;
-            }
-
-            char tmp = matr.get(nfrom).get(from);
-            matr.get(nfrom).set(from, '-');
-            matr.get(nto-1).set(to, tmp);*/
