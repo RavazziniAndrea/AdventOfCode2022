@@ -14,30 +14,37 @@ public class Day5
     private static final String INPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/easyInput.txt";
 //    private static final String INPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/input.txt";
 
+//    private static List<List<Character>> matr;
+//    public static String[][] mat;
+
     public static void main(String[] args)
     {
         log.info(DAY);
         long start = System.currentTimeMillis();
-        String[][] mat;
 
         try
         {
-            int num=-1;
+            int righe=-1;
+            int colonne=-1;
             Scanner sc = new Scanner(new File(INPUTPATH));
             while(sc.hasNext())
             {
                 String str = sc.nextLine();
+                colonne++;
                 if(str.contains("1") && !str.contains("move"))
                 {
-                    num=str.split("[0-9]").length;
-                    log.info("num: "+num);
+                    righe=str.split("[0-9]").length;
+                    log.info("num: "+righe);
                     break;
                 }
             }
-            assert num > 0;
+            assert righe > 0 && colonne > 0;
 
+//            char[][] matr = new char[colonne][righe];
             List<List<Character>> matr = new ArrayList<>();
+
             sc = new Scanner(new File(INPUTPATH));
+            int count=0;
             while(sc.hasNext())
             {
                 String str = sc.nextLine();
@@ -47,16 +54,18 @@ public class Day5
                             .replace("]", "")
                             .replace("   ", "-")
                             .replace(" ", ""));
-                    while(s1.length()<num) s1.append("-");
+                    while(s1.length()<righe) s1.append("-");
 
                     char[] chars = s1.toString().toCharArray();
-                    List<Character> l = new ArrayList<>();
-                    for(char c:chars)
+                    List<Character> lc = new ArrayList<>();
+                    for(int i=0;i<chars.length;i++)
                     {
-                        l.add(c);
+//                        matr[count][i]=chars[i];
+                        lc.add(chars[i]);
                     }
-                    log.info(l.toString());
-                    matr.add(l);
+                    matr.add(lc);
+                    count++;
+                    log.info(matr.toString());
                 }
                 else if(str.contains("move"))
                 {
@@ -65,6 +74,9 @@ public class Day5
                             .replace("from", ",")
                             .replace("to",",");
                     log.info(s.split(",")[0]);
+
+                    matr = eseguiIstruzioni(s, matr, righe, colonne);
+                    log.info(matr);
                 }
                 //else empty row and number row, skip
             }
@@ -75,5 +87,62 @@ public class Day5
         {
             log.error("FNF: "+INPUTPATH);
         }
+    }
+
+    private static List<List<Character>> eseguiIstruzioni(String s, List<List<Character>> matr, int righe, int colonne)
+    {
+        String[] str = s.split(",");
+        int move = Integer.parseInt(str[0]);
+        int from = Integer.parseInt(str[1])-1;
+        int to   = Integer.parseInt(str[2])-1;
+
+        assert move <= righe; //&& from <= colonne && to <= colonne;
+
+        for(int i=0; i<move;i++)
+        {
+            int nfrom = -1;
+            int nto = -1;
+            for(int x = 0;x<righe;x++)
+            {
+                if(matr.get(x).get(from) != '-')
+                {
+                    nfrom=x;
+                    break;
+                }
+            }
+            for(int x = 0;x<righe;x++) //Da qui esce nto==-1; perchè fa un giro in più dal move?
+            {
+                if(matr.get(x).get(to) != '-')
+                {
+                    nto=x;
+                    break;
+                }
+            }
+//            assert nfrom>=0 && nto>=0;
+            if(nto==0)
+            {
+                List<List<Character>> nuoval = new ArrayList<>();
+                nuoval.add(new ArrayList<>());
+                for(int j=0;j<colonne;j++)
+                {
+                    nuoval.get(0).add('-');
+                }
+                nuoval.addAll(matr);
+                matr=nuoval;
+                nto++;
+                nfrom++;
+            }
+
+            char tmp = matr.get(nfrom).get(from);
+            matr.get(nfrom).set(from, '-');
+            matr.get(nto-1).set(to, tmp);
+
+
+//            char tmp = matr[nfrom][from];
+//            matr[nfrom][from] = '-';
+//            matr[nto-1][to] = tmp;
+//            log.info("");
+        }
+        return matr;
     }
 }
