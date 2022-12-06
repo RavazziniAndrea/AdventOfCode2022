@@ -11,13 +11,12 @@ public class DayX
     static Logg log = new Logg(DayX.class, Logg.Level.INFO);
 
     private static final String DAY = DayX.class.getSimpleName().toLowerCase();
-    private static final String EASYINPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/easyInput.txt";
-    private static final String INPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/input.txt";
+    private static final String INPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/easyInput.txt";
+//    private static final String INPUTPATH = System.getProperty("user.dir") + "/src/main/java/"+DAY+"/input.txt";
 
     public static void main(String[] args)
     {
         long start = System.currentTimeMillis();
-//        try (Scanner sc = new Scanner(new File(EASYINPUTPATH)))
         try (Scanner sc = new Scanner(new File(INPUTPATH)))
         {
             int sum=0;
